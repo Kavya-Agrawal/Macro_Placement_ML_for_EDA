@@ -4,5 +4,6 @@ torch
 gym
 torch
 torchvision
-google 
 tensorboard
+tqdm
+google

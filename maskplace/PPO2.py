@@ -54,7 +54,7 @@ parser.add_argument(
     default=10,
     metavar='N',
     help='interval between training status logs (default: 10)')
-parser.add_argument('--pnm', type=int, default=128)
+parser.add_argument('--pnm', type=int, default= 30000)
 parser.add_argument('--benchmark', type=str, default='adaptec1')
 parser.add_argument('--soft_coefficient', type=float, default = 1)
 parser.add_argument('--batch_size', type=int, default=64)
@@ -321,7 +321,7 @@ def main():
     if not os.path.exists("logs"):
         os.mkdir("logs")
     fwrite = open(log_file_name, "w")
-    load_model_path = None
+    load_model_path = "model/pretrained_model.pkl"
    
     if load_model_path:
        agent.load_param(load_model_path)
@@ -330,7 +330,8 @@ def main():
     if args.is_test:
         torch.inference_mode()
 
-    for i_epoch in range(100000):
+    for i_epoch in range(1):
+        # if(placed_num_macro <  len_)
         score = 0
         raw_score = 0
         start = time.time()
@@ -367,7 +368,7 @@ def main():
                     strftime_now = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
                     if not os.path.exists("figures"):
                         os.mkdir("figures")
-                    env.save_fig("./figures/{}{}.png".format(strftime_now,int(raw_score)))
+                    env.save_fig("{}{}.png".format(strftime_now,int(raw_score)))
                     print("save_figure: figures/{}{}.png".format(strftime_now,int(raw_score)))
                 try:
                     print("start try")
@@ -382,10 +383,10 @@ def main():
             hpwl, cost = comp_res(placedb, env.node_pos, env.ratio)
             print("hpwl = {:.2f}\tcost = {:.2f}".format(hpwl, cost))
             print("time = {}s".format(end-start))
-            pl_file_path = "{}-{}-{}.pl".format(benchmark, int(hpwl), time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) ) 
+            pl_file_path = "{}-{}-{}-{}.pl".format(benchmark, time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()),int(hpwl),int(cost)) 
             save_placement(pl_file_path, env.node_pos, env.ratio)
             strftime_now = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
-            pl_path = 'gg_place_new/{}-{}-{}-{}.pl'.format(benchmark, strftime_now, int(hpwl), int(cost))
+            pl_path = '{}-{}-{}-{}.pl'.format(benchmark, strftime_now, int(hpwl), int(cost))
             fwrite_pl = open(pl_path, 'w')
             for node_name in env.node_pos:
                 if node_name == "V":
@@ -396,7 +397,7 @@ def main():
                 fwrite_pl.write("{}\t{:.4f}\t{:.4f}\n".format(node_name, x, y))
             fwrite_pl.close()
             strftime_now = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
-            env.save_fig("./figures/{}-{}-{}-{}.png".format(benchmark, strftime_now, int(hpwl), int(cost)))
+            env.save_fig("{}-{}-{}-{}.png".format(benchmark, strftime_now, int(hpwl), int(cost)))
         
         training_records.append(TrainingRecord(i_epoch, running_reward))
         if i_epoch % 1 ==0:
