@@ -321,7 +321,7 @@ def main():
     if not os.path.exists("logs"):
         os.mkdir("logs")
     fwrite = open(log_file_name, "w")
-    load_model_path = None
+    load_model_path = "model/pretrained_model.pkl"
    
     if load_model_path:
        agent.load_param(load_model_path)
