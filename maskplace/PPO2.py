@@ -18,7 +18,10 @@ from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
 
 import place_env
 import torchvision
-from place_db import PlaceDB
+# from place_db import PlaceDB
+from place_db_integrated import PlaceDB
+
+
 import time
 from tqdm import tqdm
 import random
@@ -64,7 +67,12 @@ args = parser.parse_args()
 writer = SummaryWriter('./tb_log')
 
 benchmark = args.benchmark
-placedb = PlaceDB(benchmark)
+placedb = PlaceDB(
+    benchmark=args.benchmark,
+    ordering_method="topology",  # or "topology" for heuristic
+    rl_checkpoint="rl_checkpoints/best_model.pt"
+)
+
 grid = 224
 placed_num_macro = args.pnm
 if args.pnm > placedb.node_cnt:

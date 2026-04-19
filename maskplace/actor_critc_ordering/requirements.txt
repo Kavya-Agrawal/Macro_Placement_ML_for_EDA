@@ -1,0 +1,31 @@
+# Core dependencies for RL-based macro ordering
+
+# Deep learning framework
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Numerical computing
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Data handling
+pandas>=2.0.0
+
+# Progress bars (optional but recommended)
+tqdm>=4.65.0
+
+# For saving/loading models
+pickle-mixin>=1.0.2
+
+# Testing (optional)
+pytest>=7.3.0
+
+# Additional utilities
+scikit-learn>=1.2.0
+
+# Note: Make sure you also have the MaskPlace dependencies installed
+# including any protobuf requirements for place_db_proto
