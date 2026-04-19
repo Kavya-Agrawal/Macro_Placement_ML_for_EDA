@@ -27,7 +27,7 @@ env = gym.make(
 
 # -------------------- LOAD PPO --------------------
 agent = PPO()
-agent.load_param("/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/train.py")
+agent.load_param("/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model/pretrained_model.pkl")
 
 agent.actor_net.eval()
 agent.critic_net.eval()
