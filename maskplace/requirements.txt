@@ -6,3 +6,4 @@ torch
 torchvision
 google 
 tensorboard
+tqdm

@@ -43,7 +43,6 @@ class PlaceEnv(gym.Env):
         self.num_macro = placedb.node_cnt
         self.placed_num_macro = placed_num_macro
         self.num_net = placedb.net_cnt
-        self.node_name_list = placedb.node_id_to_name
         self.action_space = spaces.Discrete(self.grid * self.grid)
         self.state = None
         self.net_min_max_ord = {}
@@ -68,6 +67,11 @@ class PlaceEnv(gym.Env):
 
 
     def reset(self):
+
+        # Ensure ordering is set
+        if not hasattr(self, "node_id_to_name") or self.node_id_to_name is None:
+            self.node_id_to_name = self.placedb.node_id_to_name.copy()
+
         self.num_macro_placed = 0
         num_macro = self.num_macro
         canvas = np.zeros((self.grid, self.grid))
@@ -112,11 +116,11 @@ class PlaceEnv(gym.Env):
         net_img = np.zeros((self.grid, self.grid))
         net_img_2 = np.zeros((self.grid, self.grid))
 
-        next_x = math.ceil(max(1, self.placedb.node_info[self.node_name_list[self.num_macro_placed]]['x'] / self.ratio))
-        next_y = math.ceil(max(1, self.placedb.node_info[self.node_name_list[self.num_macro_placed]]['y'] / self.ratio))
+        next_x = math.ceil(max(1, self.placedb.node_info[self.node_id_to_name[self.num_macro_placed]]['x'] / self.ratio))
+        next_y = math.ceil(max(1, self.placedb.node_info[self.node_id_to_name[self.num_macro_placed]]['y'] / self.ratio))
         mask = self.get_mask(canvas, next_x, next_y)
-        next_x_2 = math.ceil(max(1, self.placedb.node_info[self.node_name_list[self.num_macro_placed+1]]['x'] / self.ratio))
-        next_y_2 = math.ceil(max(1, self.placedb.node_info[self.node_name_list[self.num_macro_placed+1]]['y'] / self.ratio))
+        next_x_2 = math.ceil(max(1, self.placedb.node_info[self.node_id_to_name[self.num_macro_placed+1]]['x'] / self.ratio))
+        next_y_2 = math.ceil(max(1, self.placedb.node_info[self.node_id_to_name[self.num_macro_placed+1]]['y'] / self.ratio))
         mask_2 = self.get_mask(canvas, next_x_2, next_y_2)
         for net_name in self.placedb.net_info:
             self.net_placed_set[net_name] = set()
@@ -149,12 +153,14 @@ class PlaceEnv(gym.Env):
     # WireMask
     def get_net_img(self, is_next_next = False):
         net_img = np.zeros((self.grid, self.grid))
+        #################################################################################################
         if not is_next_next:
-            next_node_name = self.placedb.node_id_to_name[self.num_macro_placed]
-        elif self.num_macro_placed + 1 < len(self.placedb.node_id_to_name):
-            next_node_name = self.placedb.node_id_to_name[self.num_macro_placed + 1]
+            next_node_name = self.node_id_to_name[self.num_macro_placed]
+        elif self.num_macro_placed + 1 < len(self.node_id_to_name):
+            next_node_name = self.node_id_to_name[self.num_macro_placed + 1]
         else:
             return net_img
+        #################################################################################################
 
         for net_name in self.placedb.node_to_net_dict[next_node_name]:
             if net_name in self.net_min_max_ord:
@@ -194,8 +200,9 @@ class PlaceEnv(gym.Env):
     
         if mask[x][y] == 1:
             reward += -200000
-                
-        node_name = self.placedb.node_id_to_name[self.num_macro_placed]
+        #######################################################################################################        
+        node_name = self.node_id_to_name[self.num_macro_placed]
+        #######################################################################################################
         size_x = math.ceil(max(1, self.placedb.node_info[node_name]['x']/self.ratio))
         size_y = math.ceil(max(1, self.placedb.node_info[node_name]['y']/self.ratio))
 
@@ -209,7 +216,7 @@ class PlaceEnv(gym.Env):
         canvas[x, y: y + size_y] = 0.5
         if x + size_x - 1 < self.grid:
             canvas[max(0, x+size_x-1), y: y + size_y] = 0.5
-        self.node_pos[self.node_name_list[self.num_macro_placed]] = (x, y, size_x, size_y)
+        self.node_pos[self.node_id_to_name[self.num_macro_placed]] = (x, y, size_x, size_y)
 
         for net_name in self.placedb.node_to_net_dict[node_name]:
             self.net_placed_set[net_name].add(node_name)
@@ -297,12 +304,12 @@ class PlaceEnv(gym.Env):
         mask = np.ones((self.grid, self.grid))
         mask_2 = np.ones((self.grid, self.grid))
         if not done: # get next macro size and pre-mask the solution
-            next_x = math.ceil(max(1, self.placedb.node_info[self.placedb.node_id_to_name[self.num_macro_placed]]['x']/self.ratio))
-            next_y = math.ceil(max(1, self.placedb.node_info[self.placedb.node_id_to_name[self.num_macro_placed]]['y']/self.ratio))
+            next_x = math.ceil(max(1, self.placedb.node_info[self.node_id_to_name[self.num_macro_placed]]['x']/self.ratio))
+            next_y = math.ceil(max(1, self.placedb.node_info[self.node_id_to_name[self.num_macro_placed]]['y']/self.ratio))
             mask = self.get_mask(canvas, next_x, next_y)
             if self.num_macro_placed + 1 < self.placed_num_macro:
-                next_x_2 = math.ceil(max(1, self.placedb.node_info[self.placedb.node_id_to_name[self.num_macro_placed+1]]['x']/self.ratio))
-                next_y_2 = math.ceil(max(1, self.placedb.node_info[self.placedb.node_id_to_name[self.num_macro_placed+1]]['y']/self.ratio))
+                next_x_2 = math.ceil(max(1, self.placedb.node_info[self.node_id_to_name[self.num_macro_placed+1]]['x']/self.ratio))
+                next_y_2 = math.ceil(max(1, self.placedb.node_info[self.node_id_to_name[self.num_macro_placed+1]]['y']/self.ratio))
                 mask_2 = self.get_mask(canvas, next_x_2, next_y_2)
         else:
             next_x = 0
@@ -329,7 +336,9 @@ class PlaceEnv(gym.Env):
     def test_max_rudy(self, action):
         x = round(action // self.grid)
         y = round(action % self.grid)
-        node_name = self.placedb.node_id_to_name[self.num_macro_placed]
+        ###############################################################################################
+        node_name = self.node_id_to_name[self.num_macro_placed]
+        ###############################################################################################
         rudy_tmp = copy.deepcopy(self.rudy)
         for net_name in self.placedb.node_to_net_dict[node_name]:
             self.net_placed_set[net_name].add(node_name)
