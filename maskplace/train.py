@@ -14,7 +14,7 @@ from PPO2 import PPO
 benchmark = "adaptec1"
 placedb = PlaceDB(benchmark)
 
-placed_num_macro = 128   # MUST match PPO training
+placed_num_macro = 543   # MUST match PPO training
 grid = 224
 
 env = gym.make(
