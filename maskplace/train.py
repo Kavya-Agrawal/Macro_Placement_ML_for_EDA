@@ -14,7 +14,7 @@ from PPO2 import PPO
 benchmark = "adaptec1"
 placedb = PlaceDB(benchmark)
 
-placed_num_macro = 543   # MUST match PPO training
+placed_num_macro = 128   # MUST match PPO training
 grid = 224
 
 env = gym.make(
@@ -49,7 +49,7 @@ def run_placement(ordering):
     hpwl, cost = comp_res(placedb, env.node_pos, env.ratio)
 
     # normalize (VERY IMPORTANT)
-    reward = (-hpwl - cost) / 1e6
+    reward = (-hpwl) / 1e6
 
     return reward, hpwl, cost
 
