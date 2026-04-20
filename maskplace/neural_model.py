@@ -15,7 +15,7 @@ class GNNLayer(nn.Module):
 
 
 class GNNOrderingModel(nn.Module):
-    def __init__(self, in_dim=2, hidden_dim=64, num_layers=3):
+    def __init__(self, in_dim=4, hidden_dim=64, num_layers=3):
         super().__init__()
 
         self.layers = nn.ModuleList()

@@ -222,14 +222,15 @@ def get_node_id_to_name_topology(node_info, node_to_net_dict, net_info, benchmar
     import torch
 
     # ---- Import your existing modules (unchanged) ----
-    from neural_model import GNNOrderingModel
+    # from neural_model import GNNOrderingModel
+    from pointer_model import PointerOrderingModel
     from ordering_policy import sample_ordering
 
     # ---- Device ----
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # ---- Initialize model ----
-    model = GNNOrderingModel().to(device)
+    model = PointerOrderingModel().to(device)
 
     # ---- Load trained weights if available ----
     try:

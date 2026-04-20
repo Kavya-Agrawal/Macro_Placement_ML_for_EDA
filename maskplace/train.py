@@ -3,7 +3,8 @@ import torch.optim as optim
 import gym
 import numpy as np
 
-from neural_model import GNNOrderingModel
+# from neural_model import GNNOrderingModel
+from pointer_model import PointerOrderingModel
 from ordering_policy import sample_ordering
 from comp_res import comp_res
 from place_db import PlaceDB
@@ -27,7 +28,9 @@ env = gym.make(
 
 # -------------------- LOAD PPO --------------------
 agent = PPO()
-agent.load_param("/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model/pretrained_model.pkl")
+agent.load_param("/home/pratyush-kumar-swain/Desktop/Macro_Placement_ML_for_EDA/maskplace/model/pretrained_model.pkl")
+
+print("Actor first layer weights:",next(agent.actor_net.parameters())[0][:5])
 
 agent.actor_net.eval()
 agent.critic_net.eval()
@@ -59,7 +62,8 @@ def train(node_info, node_to_net_dict, epochs=1000):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model = GNNOrderingModel().to(device)
+    # model = GNNOrderingModel().to(device)
+    model = PointerOrderingModel().to(device)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
     baseline = None
