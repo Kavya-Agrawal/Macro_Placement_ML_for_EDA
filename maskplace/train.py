@@ -216,7 +216,7 @@ def main():
 
     model = PointerOrderingModel().to(device)
 
-    🔥 STEP 1: Imitation
+    # 🔥 STEP 1: Imitation
     pretrain(
         model,
         placedb,
