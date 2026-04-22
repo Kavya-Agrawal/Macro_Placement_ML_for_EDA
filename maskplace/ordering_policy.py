@@ -4,8 +4,11 @@ from graph_utils import build_graph
 
 
 def sample_ordering(model, node_info, node_to_net_dict, device):
+    # entropy_list = []
 
-    x, adj, node_names = build_graph(node_info, node_to_net_dict)
+    # dist = Categorical(probs)
+    # entropy_list.append(dist.entropy())
+    x, adj, node_names = build_graph(node_info, node_to_net_dict, device)
 
     x = x.to(device)
     adj = adj.to(device)
@@ -13,6 +16,7 @@ def sample_ordering(model, node_info, node_to_net_dict, device):
     selected, log_prob = model(x, adj)
 
     ordering = [node_names[i] for i in selected]
+    # entropy = torch.stack(entropy_list).mean()
 
     return ordering, log_prob
 

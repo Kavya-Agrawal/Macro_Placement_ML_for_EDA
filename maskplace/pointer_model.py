@@ -210,6 +210,44 @@ class PointerDecoder(nn.Module):
             inp = embeddings[idx].unsqueeze(0)
 
         return selected_indices, torch.stack(log_probs).sum()
+    
+    def forward_supervised(self, embeddings, target_indices):
+        """
+        embeddings: [N, D]
+        target_indices: [N]  (ground truth ordering indices)
+
+        returns:
+            logits: [N, N]
+        """
+        N, D = embeddings.shape
+        device = embeddings.device
+
+        h = torch.zeros(1, D, device=device)
+        c = torch.zeros(1, D, device=device)
+
+        inp = embeddings.mean(dim=0, keepdim=True)
+
+        logits = []
+        mask = torch.zeros(N, device=device)
+
+        for t in range(N):
+            h, c = self.lstm(inp, (h, c))
+
+            query = self.W_q(h)
+            keys = self.W_k(embeddings)
+
+            scores = self.v(torch.tanh(query + keys)).squeeze(-1)
+
+            masked_scores = scores + mask
+            logits.append(masked_scores)
+
+            # 🔥 teacher forcing
+            idx = target_indices[t]
+            mask[idx] = -1e9
+
+            inp = embeddings[idx].unsqueeze(0)
+
+        return torch.stack(logits)  # [N, N]
 
 # ---------------- INTEGRATED MODEL ----------------
 class PointerOrderingModel(nn.Module):
@@ -223,3 +261,7 @@ class PointerOrderingModel(nn.Module):
         # adj: Adjacency matrix [N, N]
         embeddings = self.encoder(x, adj)
         return self.decoder(embeddings)
+    
+    def forward_supervised(self, x, adj, target_indices):
+        embeddings = self.encoder(x, adj)
+        return self.decoder.forward_supervised(embeddings, target_indices)
