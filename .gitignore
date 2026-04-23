@@ -22,4 +22,24 @@ save_models/
 # Jupyter
 .ipynb_checkpoints/
 
-dataset/
+adaptec2
+adaptec3
+adaptec4
+bigblue1
+bigblue2
+bigblue3
+bigblue4
+
+*.zip
+
+./maskplace/adaptec2*
+./maskplace/adaptec3*
+./maskplace/adaptec4*
+./maskplace/bigblue1*
+./maskplace/bigblue2*
+./maskplace/bigblue3*
+./maskplace/bigblue4*
+
+./maskplace_ok.zip
+maskplace.zip
+Macro_Placement_ML_for_EDA/maskplace_ok.zip
