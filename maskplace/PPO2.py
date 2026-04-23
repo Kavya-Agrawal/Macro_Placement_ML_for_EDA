@@ -69,7 +69,7 @@ writer = SummaryWriter('./tb_log')
 benchmark = args.benchmark
 placedb = PlaceDB(
     benchmark=args.benchmark,
-    ordering_method="topology",  # or "topology" for heuristic
+    ordering_method="rl",  # or "topology" for heuristic
     rl_checkpoint="rl_checkpoints/best_model.pt"
 )
 
