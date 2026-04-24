@@ -10,14 +10,36 @@ def prim_real(vertexs_tmp, node_pos, net_info, ratio, node_info, port_info):# ve
         adjacent_dict[node] = []
     for node1, node2 in list(combinations(vertexs, 2)):
         if node1 in node_pos:
-            pin_x_1 = node_pos[node1][0] * ratio + node_info[node1]["x"] / 2 + net_info[node1]["x_offset"] # )//ratio
-            pin_y_1 = node_pos[node1][1] * ratio + node_info[node1]["y"] / 2 + net_info[node1]["y_offset"] # )//ratio
+            rot1 = node_pos[node1][4] if len(node_pos[node1]) > 4 else False
+            xo1 = net_info[node1]["x_offset"]
+            yo1 = net_info[node1]["y_offset"]
+            if rot1:
+                hx1 = node_info[node1]["y"] / 2
+                hy1 = node_info[node1]["x"] / 2
+                ex1, ey1 = -yo1, xo1
+            else:
+                hx1 = node_info[node1]["x"] / 2
+                hy1 = node_info[node1]["y"] / 2
+                ex1, ey1 = xo1, yo1
+            pin_x_1 = node_pos[node1][0] * ratio + hx1 + ex1
+            pin_y_1 = node_pos[node1][1] * ratio + hy1 + ey1
         else:
             pin_x_1 = port_info[node1]['x']
             pin_y_1 = port_info[node1]['y']
         if node2 in node_pos:
-            pin_x_2 = node_pos[node2][0] * ratio + node_info[node2]["x"] / 2 + net_info[node2]["x_offset"] # )//ratio
-            pin_y_2 = node_pos[node2][1] * ratio + node_info[node2]["y"] / 2 + net_info[node2]["y_offset"] # )//ratio
+            rot2 = node_pos[node2][4] if len(node_pos[node2]) > 4 else False
+            xo2 = net_info[node2]["x_offset"]
+            yo2 = net_info[node2]["y_offset"]
+            if rot2:
+                hx2 = node_info[node2]["y"] / 2
+                hy2 = node_info[node2]["x"] / 2
+                ex2, ey2 = -yo2, xo2
+            else:
+                hx2 = node_info[node2]["x"] / 2
+                hy2 = node_info[node2]["y"] / 2
+                ex2, ey2 = xo2, yo2
+            pin_x_2 = node_pos[node2][0] * ratio + hx2 + ex2
+            pin_y_2 = node_pos[node2][1] * ratio + hy2 + ey2
         else:
             pin_x_2 = port_info[node2]['x']
             pin_y_2 = port_info[node2]['y']

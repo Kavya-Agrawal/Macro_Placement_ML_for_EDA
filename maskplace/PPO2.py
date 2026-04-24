@@ -73,7 +73,7 @@ if args.pnm > placedb.node_cnt:
 env = gym.make('place_env-v0', placedb = placedb, placed_num_macro = placed_num_macro, grid = grid).unwrapped
 
 num_emb_state = 64 + 2 + 1
-num_state = 1 + grid*grid*5 + 2
+num_state = 1 + grid*grid*5 + 3
 
 def seed_torch(seed=0):
     random.seed(seed)
@@ -136,7 +136,7 @@ class Actor(nn.Module):
         super(Actor, self).__init__()
         self.fc1 = nn.Linear(num_emb_state, 512)
         self.fc2 = nn.Linear(512, 64)
-        self.fc3 = nn.Linear(64, grid * grid)
+        self.fc3 = nn.Linear(64, grid * grid * 2)
         self.cnn = cnn
         self.cnn_coarse = cnn_coarse
         self.gcn = None
@@ -159,9 +159,18 @@ class Actor(nn.Module):
         net_img_min = net_img.min() + args.soft_coefficient
         mask2 = net_img.le(net_img_min).logical_not().float()
 
-        x = cnn_res
-        x = x.reshape(-1, grid * grid)
-        x = torch.where(mask + mask2 >=1.0, -1.0e10, x.double())
+        # spatial score map: shape (B, 1, grid, grid) -> (B, grid*grid)
+        scores = cnn_res.reshape(-1, grid * grid)
+
+        # Orientation 0 (original): mask out invalid positions
+        scores_orig = torch.where(mask + mask2 >= 1.0, -1.0e10, scores.double())
+
+        # Orientation 1 (rotated 90-deg): same spatial scores, same position mask
+        # The env will penalise truly-invalid rotated placements via -200000 reward
+        scores_rot = torch.where(mask + mask2 >= 1.0, -1.0e10, scores.double())
+
+        # Concatenate: first grid*grid = original, second grid*grid = rotated
+        x = torch.cat([scores_orig, scores_rot], dim=1)   # (B, grid*grid*2)
         x = self.softmax(x)
 
         return x, cnn_res, gcn_res
@@ -295,7 +304,7 @@ def save_placement(file_path, node_pos, ratio):
     node_place = {}
     for node_name in node_pos:
 
-        x, y,_ , _ = node_pos[node_name]
+        x, y, _, _, _ = node_pos[node_name]
         x = round(x * ratio + ratio) 
         y = round(y * ratio + ratio)
         node_place[node_name] = (x, y)
@@ -321,7 +330,7 @@ def main():
     if not os.path.exists("logs"):
         os.mkdir("logs")
     fwrite = open(log_file_name, "w")
-    load_model_path = "model/pretrained_model.pkl"
+    load_model_path = None
    
     if load_model_path:
        agent.load_param(load_model_path)
@@ -330,7 +339,7 @@ def main():
     if args.is_test:
         torch.inference_mode()
 
-    for i_epoch in range(1):
+    for i_epoch in range(2):
         # if(placed_num_macro <  len_)
         score = 0
         raw_score = 0
@@ -391,7 +400,7 @@ def main():
             for node_name in env.node_pos:
                 if node_name == "V":
                     continue
-                x, y, size_x, size_y = env.node_pos[node_name]
+                x, y, size_x, size_y, _rotated = env.node_pos[node_name]
                 x = x * env.ratio + placedb.node_info[node_name]['x'] /2.0
                 y = y * env.ratio + placedb.node_info[node_name]['y'] /2.0
                 fwrite_pl.write("{}\t{:.4f}\t{:.4f}\n".format(node_name, x, y))

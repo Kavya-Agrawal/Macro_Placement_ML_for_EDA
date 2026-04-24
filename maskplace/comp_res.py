@@ -14,10 +14,19 @@ def comp_res(placedb, node_pos, ratio):
         for node_name in placedb.net_info[net_name]["nodes"]:
             if node_name not in node_pos:
                 continue
-            h = placedb.node_info[node_name]['x']
-            w = placedb.node_info[node_name]['y']
-            pin_x = node_pos[node_name][0] * ratio + h / 2.0 + placedb.net_info[net_name]["nodes"][node_name]["x_offset"]
-            pin_y = node_pos[node_name][1] * ratio + w / 2.0 + placedb.net_info[net_name]["nodes"][node_name]["y_offset"]
+            raw_w = placedb.node_info[node_name]['x']
+            raw_h = placedb.node_info[node_name]['y']
+            rotated = node_pos[node_name][4] if len(node_pos[node_name]) > 4 else False
+            x_off_orig = placedb.net_info[net_name]["nodes"][node_name]["x_offset"]
+            y_off_orig = placedb.net_info[net_name]["nodes"][node_name]["y_offset"]
+            if rotated:
+                half_x, half_y = raw_h / 2.0, raw_w / 2.0
+                eff_x_off, eff_y_off = -y_off_orig, x_off_orig
+            else:
+                half_x, half_y = raw_w / 2.0, raw_h / 2.0
+                eff_x_off, eff_y_off = x_off_orig, y_off_orig
+            pin_x = node_pos[node_name][0] * ratio + half_x + eff_x_off
+            pin_y = node_pos[node_name][1] * ratio + half_y + eff_y_off
             max_x = max(pin_x, max_x)
             min_x = min(pin_x, min_x)
             max_y = max(pin_y, max_y)

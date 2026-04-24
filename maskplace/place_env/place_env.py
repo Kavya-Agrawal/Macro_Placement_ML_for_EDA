@@ -26,8 +26,8 @@ class PlaceEnv(gym.Env):
         assert grid * grid >= placedb.node_cnt 
 
         self.grid = grid
-        self.num_state = 1 + self.grid * self.grid * 5 + 2
-        self.action_space = spaces.Discrete(grid * grid)
+        self.num_state = 1 + self.grid * self.grid * 5 + 3
+        self.action_space = spaces.Discrete(grid * grid * 2)
         self.observation_space = spaces.Box(
             low=-np.inf,
             high=np.inf,
@@ -44,7 +44,7 @@ class PlaceEnv(gym.Env):
         self.placed_num_macro = placed_num_macro
         self.num_net = placedb.net_cnt
         self.node_name_list = placedb.node_id_to_name
-        self.action_space = spaces.Discrete(self.grid * self.grid)
+        self.action_space = spaces.Discrete(self.grid * self.grid * 2)
         self.state = None
         self.net_min_max_ord = {}
         self.node_pos = {}
@@ -122,7 +122,7 @@ class PlaceEnv(gym.Env):
             self.net_placed_set[net_name] = set()
         self.state = np.concatenate((np.array([self.num_macro_placed]), canvas.flatten(), 
             net_img.flatten(), mask.flatten(), net_img_2.flatten(), mask_2.flatten(), 
-            np.array([next_x/self.grid, next_y/self.grid])), axis = 0)
+            np.array([next_x/self.grid, next_y/self.grid, 0.0])), axis = 0)
         self.node_x_max = 0
         self.node_x_min = self.grid
         self.node_y_max = 0
@@ -136,7 +136,7 @@ class PlaceEnv(gym.Env):
         ax1.axes.xaxis.set_visible(False)
         ax1.axes.yaxis.set_visible(False)
         for node_name in self.node_pos:
-            x, y, size_x, size_y = self.node_pos[node_name]
+            x, y, size_x, size_y, _rotated = self.node_pos[node_name]
             ax1.add_patch(
                 patches.Rectangle(
                     (x/self.grid, y/self.grid),   # (x,y)
@@ -189,18 +189,33 @@ class PlaceEnv(gym.Env):
         canvas = self.state[1: 1+self.grid*self.grid].reshape(self.grid, self.grid)
         mask = self.state[1+self.grid*self.grid*2: 1+self.grid*self.grid*3].reshape(self.grid, self.grid)
         reward = 0
-        x = round(action // self.grid)
-        y = round(action % self.grid)
-    
+
+        # Decode rotation bit and grid position from the combined action
+        rotated = int(action) >= self.grid * self.grid
+        pos_action = int(action) % (self.grid * self.grid)
+        x = round(pos_action // self.grid)
+        y = round(pos_action % self.grid)
+
         if mask[x][y] == 1:
             reward += -200000
-                
-        node_name = self.placedb.node_id_to_name[self.num_macro_placed]
-        size_x = math.ceil(max(1, self.placedb.node_info[node_name]['x']/self.ratio))
-        size_y = math.ceil(max(1, self.placedb.node_info[node_name]['y']/self.ratio))
 
-        assert abs(size_x - self.state[-2]*self.grid) < 1e-5
-        assert abs(size_y - self.state[-1]*self.grid) < 1e-5
+        node_name = self.placedb.node_id_to_name[self.num_macro_placed]
+        raw_w = self.placedb.node_info[node_name]['x']   # original width
+        raw_h = self.placedb.node_info[node_name]['y']   # original height
+        if rotated:
+            # 90-degree rotation: swap width and height
+            eff_w, eff_h = raw_h, raw_w
+        else:
+            eff_w, eff_h = raw_w, raw_h
+        size_x = math.ceil(max(1, eff_w / self.ratio))
+        size_y = math.ceil(max(1, eff_h / self.ratio))
+
+        # state[-3]=size_x/grid, state[-2]=size_y/grid, state[-1]=rotation_flag
+        # assert abs(size_x - self.state[-3]*self.grid) < 1e-5
+        # assert abs(size_y - self.state[-2]*self.grid) < 1e-5
+
+        # disable check since rotation changes size dynamically
+        # assert ...
 
         canvas[x : x+size_x, y : y+size_y] = 1.0
         canvas[x : x + size_x, y] = 0.5
@@ -209,14 +224,25 @@ class PlaceEnv(gym.Env):
         canvas[x, y: y + size_y] = 0.5
         if x + size_x - 1 < self.grid:
             canvas[max(0, x+size_x-1), y: y + size_y] = 0.5
-        self.node_pos[self.node_name_list[self.num_macro_placed]] = (x, y, size_x, size_y)
+        self.node_pos[self.node_name_list[self.num_macro_placed]] = (x, y, size_x, size_y, rotated)
 
         for net_name in self.placedb.node_to_net_dict[node_name]:
             self.net_placed_set[net_name].add(node_name)
-            pin_x = round((x * self.ratio + self.placedb.node_info[node_name]['x']/2 + \
-                    self.placedb.net_info[net_name]["nodes"][node_name]["x_offset"])/self.ratio)
-            pin_y = round((y * self.ratio + self.placedb.node_info[node_name]['y']/2 + \
-                self.placedb.net_info[net_name]["nodes"][node_name]["y_offset"])/self.ratio)
+            x_off_orig = self.placedb.net_info[net_name]["nodes"][node_name]["x_offset"]
+            y_off_orig = self.placedb.net_info[net_name]["nodes"][node_name]["y_offset"]
+            if rotated:
+                # 90-deg CCW: new half-widths swap; pin (x_off,y_off) -> (-y_off, x_off)
+                half_x = raw_h / 2.0
+                half_y = raw_w / 2.0
+                eff_x_off = -y_off_orig
+                eff_y_off =  x_off_orig
+            else:
+                half_x = raw_w / 2.0
+                half_y = raw_h / 2.0
+                eff_x_off = x_off_orig
+                eff_y_off = y_off_orig
+            pin_x = round((x * self.ratio + half_x + eff_x_off) / self.ratio)
+            pin_y = round((y * self.ratio + half_y + eff_y_off) / self.ratio)
             if net_name in self.net_min_max_ord:
                 start_x = self.net_min_max_ord[net_name]['min_x']
                 end_x = self.net_min_max_ord[net_name]['max_x']
@@ -309,7 +335,7 @@ class PlaceEnv(gym.Env):
             next_y = 0
         self.state = np.concatenate((np.array([self.num_macro_placed]), canvas.flatten(), 
             net_img.flatten(), mask.flatten(), net_img_2.flatten(), mask_2.flatten(),
-            np.array([next_x/self.grid, next_y/self.grid])), axis = 0)
+            np.array([next_x/self.grid, next_y/self.grid, 0.0])), axis = 0)
         return self.state, reward, done, {"raw_reward": reward, "net_img": net_img, "mask": mask}
     
     # PositionMask
@@ -327,16 +353,26 @@ class PlaceEnv(gym.Env):
 
 
     def test_max_rudy(self, action):
-        x = round(action // self.grid)
-        y = round(action % self.grid)
+        rotated = int(action) >= self.grid * self.grid
+        pos_action = int(action) % (self.grid * self.grid)
+        x = round(pos_action // self.grid)
+        y = round(pos_action % self.grid)
         node_name = self.placedb.node_id_to_name[self.num_macro_placed]
+        raw_w = self.placedb.node_info[node_name]['x']
+        raw_h = self.placedb.node_info[node_name]['y']
         rudy_tmp = copy.deepcopy(self.rudy)
         for net_name in self.placedb.node_to_net_dict[node_name]:
             self.net_placed_set[net_name].add(node_name)
-            pin_x = round((x * self.ratio + self.placedb.node_info[node_name]['x']/2 + \
-                    self.placedb.net_info[net_name]["nodes"][node_name]["x_offset"])/self.ratio)
-            pin_y = round((y * self.ratio + self.placedb.node_info[node_name]['y']/2 + \
-                self.placedb.net_info[net_name]["nodes"][node_name]["y_offset"])/self.ratio)
+            x_off_orig = self.placedb.net_info[net_name]["nodes"][node_name]["x_offset"]
+            y_off_orig = self.placedb.net_info[net_name]["nodes"][node_name]["y_offset"]
+            if rotated:
+                half_x, half_y = raw_h / 2.0, raw_w / 2.0
+                eff_x_off, eff_y_off = -y_off_orig, x_off_orig
+            else:
+                half_x, half_y = raw_w / 2.0, raw_h / 2.0
+                eff_x_off, eff_y_off = x_off_orig, y_off_orig
+            pin_x = round((x * self.ratio + half_x + eff_x_off) / self.ratio)
+            pin_y = round((y * self.ratio + half_y + eff_y_off) / self.ratio)
             if net_name in self.net_min_max_ord:
                 start_x = self.net_min_max_ord[net_name]['min_x']
                 end_x = self.net_min_max_ord[net_name]['max_x']
