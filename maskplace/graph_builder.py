@@ -1,4 +1,4 @@
-git import torch
+import torch
 from itertools import combinations
 
 def build_static_graph_tensors(node_info, node_to_net_dict, net_info):
