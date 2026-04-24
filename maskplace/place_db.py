@@ -209,6 +209,7 @@ def get_node_id_to_name_topology(node_info, node_to_net_dict, net_info, benchmar
     # print("node_id_to_name")
     # print(node_id_to_name)
     node_id_to_name_res = [x for x, _ in node_id_to_name]
+    # random.shuffle(node_id_to_name_res)
     return node_id_to_name_res
 
 
