@@ -419,7 +419,7 @@ def train(model, epochs=1000):
             torch.save(model.state_dict(), "gnn_ordering_model_best_multi.pth")
             print(f"🔥 NEW BEST HPWL ({bench}): {hpwl:.2f}")
 
-        if epoch % 10 == 0:
+        if epoch % 1 == 0:
             print("="*60)
             print(f"Epoch: {epoch} | Benchmark: {bench}")
             print(f"HPWL: {hpwl:.2f} | Reward: {reward:.4f}")
