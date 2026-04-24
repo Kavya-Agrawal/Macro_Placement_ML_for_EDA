@@ -44,10 +44,23 @@ def build_graph(node_info, node_to_net_dict, device):
     node_names = list(node_info.keys())
     N = len(node_names)
 
+    # max_area1=0
+    # areas=[]
+    # ans=""
+
     name_to_idx = {n: i for i, n in enumerate(node_names)}
 
     # ---------------- FEATURE NORMALIZATION ----------------
     areas = [node_info[n]['x'] * node_info[n]['y'] for n in node_names]
+    # for n in node_names:
+    #     area1 = node_info[n]['x'] * node_info[n]['y']
+    #     areas.append(area1)
+    #     if(area1>max_area1):
+    #         max_area1=area1
+    #         ans=n
+    
+    # print(ans)
+
     widths = [node_info[n]['x'] for n in node_names]
     heights = [node_info[n]['y'] for n in node_names]
     degrees = [len(node_to_net_dict[n]) for n in node_names]
@@ -56,6 +69,8 @@ def build_graph(node_info, node_to_net_dict, device):
     max_w = max(widths)
     max_h = max(heights)
     max_deg = max(degrees)
+
+    # print(max_area)
 
     x = []
     for n in node_names:

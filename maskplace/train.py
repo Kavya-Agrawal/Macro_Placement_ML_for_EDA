@@ -55,7 +55,7 @@ env = gym.make(
 
 # -------------------- LOAD PPO --------------------                                                                                 
 agent = PPO()
-agent.load_param("/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model/pretrained_model.pkl")
+agent.load_param("/home/pratyush-kumar-swain/Desktop/Macro_Placement_ML_for_EDA/maskplace/model/pretrained_model.pkl")
 
 print("Actor first layer weights:",next(agent.actor_net.parameters())[0][:5])
 
