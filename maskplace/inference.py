@@ -41,10 +41,10 @@ def main():
     
     # 3. Map IDs back to Names
     id_to_name_map = {v['id']: k for k, v in placedb.node_info.items()}
-    print(best_sequence_ids)
-    print(id_to_name_map)
+    #print(best_sequence_ids)
+    #print(id_to_name_map)
     mapped_sequence = [id_to_name_map[idx] for idx in best_sequence_ids]
-    print(mapped_sequence)
+    #print(mapped_sequence)
     # ---------------------------------------------------------
     # 4. IN-MEMORY HANDOFF
     # ---------------------------------------------------------
