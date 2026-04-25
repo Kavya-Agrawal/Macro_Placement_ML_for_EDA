@@ -209,11 +209,11 @@ def get_node_id_to_name_topology(node_info, node_to_net_dict, net_info, benchmar
     # print("node_id_to_name")
     # print(node_id_to_name)
     node_id_to_name_res = [x for x, _ in node_id_to_name]
-    # random.shuffle(node_id_to_name_res)
     return node_id_to_name_res
 
 
 class PlaceDB():
+    custom_mcts_sequence = None
 
     def __init__(self, benchmark = "adaptec1"):
         self.benchmark = benchmark
@@ -243,7 +243,19 @@ class PlaceDB():
             pl_file.close()
             self.port_to_net_dict = {}
         self.node_to_net_dict = get_node_to_net_dict(self.node_info, self.net_info)
-        self.node_id_to_name = get_node_id_to_name_topology(self.node_info, self.node_to_net_dict, self.net_info, self.benchmark)
+        #self.node_id_to_name = get_node_id_to_name_topology(self.node_info, self.node_to_net_dict, self.net_info, self.benchmark)
+        if PlaceDB.custom_mcts_sequence is not None:
+            print("🚀 Memory-Injecting custom MCTS sequence into MaskPlace...")
+            self.node_id_to_name = PlaceDB.custom_mcts_sequence
+        else:
+            # Fallback to MaskPlace default
+            self.node_id_to_name = get_node_id_to_name_topology(
+                self.node_info, 
+                self.node_to_net_dict, 
+                self.net_info, 
+                self.benchmark
+            )
+            #print(self.node_id_to_name)
 
     def debug_str(self):
         print("node_cnt = {}".format(len(self.node_info)))

@@ -60,7 +60,9 @@ parser.add_argument('--soft_coefficient', type=float, default = 1)
 parser.add_argument('--batch_size', type=int, default=64)
 parser.add_argument('--is_test', action='store_true', default=False)
 parser.add_argument('--save_fig', action='store_true', default=False)
-args = parser.parse_args()
+#args = parser.parse_args()
+args, _ = parser.parse_known_args()
+args.is_test = True
 writer = SummaryWriter('./tb_log')
 
 benchmark = args.benchmark
@@ -354,6 +356,15 @@ def main():
             raw_score += info["raw_reward"]
             state = next_state
         end = time.time()
+
+        # total_macros = len(env.node_name_list)
+        # placed_count = len(env.node_pos)
+        # dropped_count = total_macros - placed_count
+    
+        # print(f"Total Macros in Sequence : {total_macros}")
+        # print(f"Successfully Placed      : {placed_count}")
+        # print(f"Dropped (Crashed Early)  : {dropped_count}")
+
 
         if i_epoch == 0:
             running_reward = score
