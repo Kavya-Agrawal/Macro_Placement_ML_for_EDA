@@ -431,7 +431,7 @@ def train(model, epochs=2000):
             print(f"⭐ NEW BEST NORM HPWL ({bench}): {norm_hpwl:.6f}")
 
         # ---- LOGGING ----
-        if epoch % 10 == 0:
+        if epoch % 1 == 0:
             print("="*60)
             print(f"Epoch: {epoch} | Benchmark: {bench}")
             print(f"HPWL: {hpwl:.2f} | Norm: {norm_hpwl:.6f}")

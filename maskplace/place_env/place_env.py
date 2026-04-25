@@ -392,9 +392,9 @@ class PlaceEnv(gym.Env):
     def __init__(self, placedb, placed_num_macro = None, grid = 224):
         
         # need to get GCN vector and CNN
-        print("grid * grid", grid * grid)
-        print("placedb.node_cnt", placedb.node_cnt)
-        print("placedb.net_cnt", placedb.net_cnt)
+        # print("grid * grid", grid * grid)
+        # print("placedb.node_cnt", placedb.node_cnt)
+        # print("placedb.net_cnt", placedb.net_cnt)
         assert grid * grid >= placedb.node_cnt 
 
         self.grid = grid
@@ -428,7 +428,7 @@ class PlaceEnv(gym.Env):
         self.node_y_max = 0
         self.node_y_min = self.grid
         self.ratio = self.placedb.max_height / self.grid
-        print("self.ratio = {:.2f}".format(self.ratio))
+        # print("self.ratio = {:.2f}".format(self.ratio))
     
     def seed(self, seed=None):
         import numpy as np

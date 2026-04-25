@@ -59,7 +59,7 @@ def read_net_file(fopen, node_info):
     for net_name in net_info:
         net_info[net_name]['id'] = net_cnt
         net_cnt += 1
-    print("adjust net size = {}".format(len(net_info)))
+    # print("adjust net size = {}".format(len(net_info)))
     return net_info
 
 
@@ -145,14 +145,14 @@ def get_node_id_to_name_topology(node_info, node_to_net_dict, net_info, benchmar
     
     node_net_num_fea= {}
     node_net_num_max = max(node_net_num.values())
-    print("node_net_num_max", node_net_num_max)
+    # print("node_net_num_max", node_net_num_max)
     for node_name in node_info:
         node_net_num_fea[node_name] = node_net_num[node_name]/node_net_num_max
     
     node_area_fea = {}
     node_area_max_node = max(node_info, key = lambda x : node_info[x]['x'] * node_info[x]['y'])
     node_area_max = node_info[node_area_max_node]['x'] * node_info[node_area_max_node]['y']
-    print("node_area_max = {}".format(node_area_max))
+    # print("node_area_max = {}".format(node_area_max))
     for node_name in node_info:
         node_area_fea[node_name] = node_info[node_name]['x'] * node_info[node_name]['y'] / node_area_max
     

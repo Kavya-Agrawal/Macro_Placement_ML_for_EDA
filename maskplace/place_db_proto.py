@@ -102,7 +102,7 @@ def get_net_info(pbtxt):
     for net_name in net_info:
         net_info[net_name]['id'] = net_cnt
         net_cnt += 1
-    print("adjust net size = {}".format(len(net_info)))
+    # print("adjust net size = {}".format(len(net_info)))
     return net_info, port_info
 
                 
