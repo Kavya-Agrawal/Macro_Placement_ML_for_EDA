@@ -247,59 +247,22 @@ import numpy as np
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
-# from neural_model import GNNOrderingModel
 from pointer_model import PointerOrderingModel
 from ordering_policy import sample_ordering
 from comp_res import comp_res
 from place_db import PlaceDB
 from PPO2 import PPO
 from graph_utils import build_graph
-from torch.distributions import Categorical
 
 
-def plot_training(hpwl_history, reward_history):
-
-    plt.figure(figsize=(12, 5))
-
-    # ---- HPWL plot ----
-    plt.subplot(1, 2, 1)
-    plt.plot(hpwl_history)
-    plt.title("HPWL over epochs")
-    plt.xlabel("Epoch")
-    plt.ylabel("HPWL")
-
-    # ---- Reward plot ----
-    plt.subplot(1, 2, 2)
-    plt.plot(reward_history)
-    plt.title("Reward over epochs")
-    plt.xlabel("Epoch")
-    plt.ylabel("Reward")
-
-    plt.tight_layout()
-    plt.savefig("training_curve.png")
-    plt.show()
-
-
-# -------------------- SETUP --------------------
+# -------------------- CONFIG --------------------
 benchmarks = ["adaptec1", "adaptec2", "adaptec3", "adaptec4"]
-# placedb = PlaceDB(benchmark)
-
-# placed_num_macro = 543   # MUST match PPO training
 grid = 224
 
-# env = gym.make(
-#     'place_env-v0',
-#     placedb=placedb,
-#     placed_num_macro=placed_num_macro,
-#     grid=grid
-# ).unwrapped
 
-
-# -------------------- LOAD PPO --------------------                                                                                 
+# -------------------- PPO LOAD --------------------
 agent = PPO()
 agent.load_param("/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model/pretrained_model.pkl")
-
-print("Actor first layer weights:",next(agent.actor_net.parameters())[0][:5])
 
 agent.actor_net.eval()
 agent.critic_net.eval()
@@ -320,14 +283,19 @@ def run_placement(ordering, env, placedb):
 
     hpwl, cost = comp_res(placedb, env.node_pos, env.ratio)
 
-    reward = (-hpwl) / 1e6
+    # ✅ normalized reward (IMPORTANT)
+    reward = -(hpwl / placedb.node_cnt)
 
     return reward, hpwl, cost
 
 
-def pretrain(model, placedb, node_info, node_to_net_dict, device, epochs=200):
+# -------------------- PRETRAIN --------------------
+def pretrain(model, placedb, device, epochs=200):
 
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+    node_info = placedb.node_info
+    node_to_net_dict = placedb.node_to_net_dict
 
     heuristic = placedb.node_id_to_name
     node_names = list(node_info.keys())
@@ -336,11 +304,12 @@ def pretrain(model, placedb, node_info, node_to_net_dict, device, epochs=200):
     target = torch.tensor([name_to_idx[n] for n in heuristic], device=device)
 
     x, adj, _ = build_graph(node_info, node_to_net_dict, device)
+
     best_loss = float('inf')
+
     for epoch in range(epochs):
 
         logits = model.forward_supervised(x, adj, target)
-
         loss = F.cross_entropy(logits, target)
 
         if loss.item() < best_loss:
@@ -357,46 +326,82 @@ def pretrain(model, placedb, node_info, node_to_net_dict, device, epochs=200):
     print("✅ Pretraining complete\n")
 
 
+# -------------------- PLOTTING --------------------
+def plot_per_benchmark(hpwl_dict, reward_dict):
 
-# -------------------- TRAINING LOOP --------------------
-def train(model, epochs=1000):
+    # ---- HPWL plots ----
+    plt.figure(figsize=(12, 8))
+
+    for i, b in enumerate(hpwl_dict.keys()):
+        plt.subplot(2, 2, i+1)
+        plt.plot(hpwl_dict[b])
+        plt.title(f"{b} - HPWL")
+        plt.xlabel("Steps")
+        plt.ylabel("HPWL")
+
+    plt.tight_layout()
+    plt.savefig("hpwl_per_benchmark.png")
+    plt.show()
+
+    # ---- Reward plots ----
+    plt.figure(figsize=(12, 8))
+
+    for i, b in enumerate(reward_dict.keys()):
+        plt.subplot(2, 2, i+1)
+        plt.plot(reward_dict[b])
+        plt.title(f"{b} - Reward")
+        plt.xlabel("Steps")
+        plt.ylabel("Reward")
+
+    plt.tight_layout()
+    plt.savefig("reward_per_benchmark.png")
+    plt.show()
+
+
+# -------------------- TRAIN --------------------
+def train(model, epochs=2000):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     optimizer = optim.Adam(model.parameters(), lr=3e-4)
 
-    benchmarks = ["adaptec1", "adaptec2", "adaptec3", "adaptec4"]
+    # ✅ tracking per benchmark
+    best_hpwl_per_bench = {b: float('inf') for b in benchmarks}
+    best_norm_hpwl_per_bench = {b: float('inf') for b in benchmarks}
+
+    # ✅ history per benchmark
+    hpwl_history_per_bench = {b: [] for b in benchmarks}
+    reward_history_per_bench = {b: [] for b in benchmarks}
 
     baseline = None
-    best_hpwl = float('inf')
 
     for epoch in range(epochs):
 
-        # 🔥 randomly pick a benchmark
+        # 🔥 sample benchmark
         bench = np.random.choice(benchmarks)
         placedb = PlaceDB(bench)
-
-        placed_num_macro = placedb.node_cnt
 
         env = gym.make(
             'place_env-v0',
             placedb=placedb,
-            placed_num_macro=placed_num_macro,
-            grid=224
+            placed_num_macro=placedb.node_cnt,
+            grid=grid
         ).unwrapped
 
-        node_info = placedb.node_info
-        node_to_net_dict = placedb.node_to_net_dict
-
-        # ---- sample ordering ----
+        # ---- ordering ----
         ordering, log_prob = sample_ordering(
             model,
-            node_info,
-            node_to_net_dict,
+            placedb.node_info,
+            placedb.node_to_net_dict,
             device
         )
 
-        # ---- evaluate ----
+        # ---- placement ----
         reward, hpwl, cost = run_placement(ordering, env, placedb)
+        norm_hpwl = hpwl / placedb.node_cnt
+
+        # ---- store history ----
+        hpwl_history_per_bench[bench].append(hpwl)
+        reward_history_per_bench[bench].append(reward)
 
         # ---- baseline ----
         if baseline is None:
@@ -406,6 +411,7 @@ def train(model, epochs=1000):
 
         advantage = reward - baseline
 
+        # ---- loss ----
         loss = -log_prob * advantage
 
         optimizer.zero_grad()
@@ -413,39 +419,50 @@ def train(model, epochs=1000):
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         optimizer.step()
 
-        # ---- tracking ----
-        if hpwl < best_hpwl:
-            best_hpwl = hpwl
-            torch.save(model.state_dict(), "gnn_ordering_model_best_multi.pth")
-            print(f"🔥 NEW BEST HPWL ({bench}): {hpwl:.2f}")
+        # ---- BEST TRACKING ----
+        if hpwl < best_hpwl_per_bench[bench]:
+            best_hpwl_per_bench[bench] = hpwl
+            torch.save(model.state_dict(), f"model_best_{bench}.pth")
+            print(f"🔥 NEW BEST RAW HPWL ({bench}): {hpwl:.2f}")
 
-        if epoch % 1 == 0:
+        if norm_hpwl < best_norm_hpwl_per_bench[bench]:
+            best_norm_hpwl_per_bench[bench] = norm_hpwl
+            torch.save(model.state_dict(), f"model_best_norm_{bench}.pth")
+            print(f"⭐ NEW BEST NORM HPWL ({bench}): {norm_hpwl:.6f}")
+
+        # ---- LOGGING ----
+        if epoch % 10 == 0:
             print("="*60)
             print(f"Epoch: {epoch} | Benchmark: {bench}")
-            print(f"HPWL: {hpwl:.2f} | Reward: {reward:.4f}")
+            print(f"HPWL: {hpwl:.2f} | Norm: {norm_hpwl:.6f}")
+            print(f"Reward: {reward:.4f}")
             print(f"Baseline: {baseline:.4f}")
+
+            print("\n📊 BEST SO FAR:")
+            for b in benchmarks:
+                print(f"{b}: Raw={best_hpwl_per_bench[b]:.2f}, Norm={best_norm_hpwl_per_bench[b]:.6f}")
             print("="*60)
 
     torch.save(model.state_dict(), "gnn_ordering_model_final_multi.pth")
 
+    # ✅ plots
+    plot_per_benchmark(hpwl_history_per_bench, reward_history_per_bench)
+
+
+# -------------------- MAIN --------------------
 def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = PointerOrderingModel().to(device)
 
-    # 🔥 LOAD EXISTING WEIGHTS (VERY IMPORTANT)
+    # 🔥 LOAD EXISTING WEIGHTS
     model.load_state_dict(torch.load("gnn_ordering_model_best.pth"))
-
     print("✅ Loaded adaptec1 pretrained weights")
 
-    # 🔥 Continue training on all benchmarks
+    # 🔥 TRAIN
     train(model, epochs=2000)
+
 
 if __name__ == "__main__":
     main()
-    
-
-
-
-
