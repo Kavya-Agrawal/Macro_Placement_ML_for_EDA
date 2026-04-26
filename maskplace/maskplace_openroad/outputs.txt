@@ -1,0 +1,508 @@
+
+anubhav@LAPTOP-CTTI8UNL:~/mleda/test_ispd2005$ ./set_zero adaptec1/adaptec1.pl
+========================================
+ [SUCCESS] Coordinates Reset to 0 0
+========================================
+ Target File: adaptec1/adaptec1.pl
+ Modified 211447 nodes to start from scratch.
+anubhav@LAPTOP-CTTI8UNL:~/mleda/test_ispd2005$ ./pl_convert_new pl_a1.txt adaptec1
+========================================
+ [SUCCESS] NEW Macro Conversion Complete
+ Mode: CENTER -> BOTTOM-LEFT
+ Inserted 543 macro coordinates safely.
+========================================
+anubhav@LAPTOP-CTTI8UNL:~/mleda/test_ispd2005$ ./sa_legalize_macros pl_a1.txt adaptec1
+[*] Phase 1: Spiral Search Legalization (Strictly Legal Initialization)...
+[*] Phase 2: Simulated Annealing Optimization...
+[*] SA Complete. Accepted: 9713, Rejected (Overlaps/Bad Cost): 57787
+========================================
+ [SUCCESS] 100% Legal SA State Saved.
+========================================
+anubhav@LAPTOP-CTTI8UNL:~/mleda/test_ispd2005$ ./run_ispd_pipeline.sh adaptec1
+========================================
+   STARTING ML-EDA PIPELINE FOR: adaptec1
+========================================
+OpenROAD 26Q1-2913-gd1719d5edc
+Features included (+) or not (-): +GPU +GUI +Python
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[WARNING ORD-0039] .openroad ignored with -python
+[INFO ODB-0227] LEF file: /home/anubhav/mleda/OpenROAD/test/Nangate45/Nangate45_tech.lef, created 22 layers, 27 vias
+[WARNING ODB-0217] duplicate VIARULE (Via1Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via1Array-1) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via1Array-2) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via1Array-3) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via1Array-4) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via2Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via2Array-1) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via2Array-2) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via2Array-3) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via2Array-4) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via3Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via3Array-1) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via3Array-2) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via4Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via5Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via6Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via7Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via8Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via9Array-0) ignoring...
+[INFO ODB-0394] Duplicate site FreePDK45_38x28_10R_NP_162NW_34O in Nangate45.lef already seen in Nangate45_tech.lef
+[INFO ODB-0227] LEF file: /home/anubhav/mleda/OpenROAD/test/Nangate45/Nangate45.lef, created 135 library cells
+--- Running Official RosettaStone Nangate45 Conversion for adaptec1 ---
+Parsing /home/anubhav/mleda/test_ispd2005/adaptec1/adaptec1.aux ...
+[WARNING] *.wts will be ignored
+Parsing adaptec1.nodes ...
+From Nodes: NumTotalNodes: 211447
+From Nodes: NumTerminals: 543
+Parsed Nodes: NumInsts: 210904
+Parsed Nodes: NumFixedInsts: 543
+Parsed Nodes: NumPrimary: 0
+
+Parsing adaptec1.pl ...
+Parsed pl: NumInstsInPl: 211447
+Parsed pl: NumFixedInsts: 543
+Parsed pl: NumPrimary: 0
+
+Parsing adaptec1.nets ...
+From Nets: NumNets: 221142
+From Nets: NumPins: 944053
+Parsed Nets: NumNets: 221142
+
+Parsing adaptec1.scl ...
+From scl: NumRows: 890
+Parsed scl: NumRows: 890
+
+Bookshelf Parsing Done
+[INFO] ManuFacturingGrid: 10
+[INFO] Fixed macro insts' pin layer is assigned as H: metal3 V: metal4
+Start Bookshelf post processing ...
+SclRowHeight: 12
+NumMovableStdInsts: 210904
+NumMovableMacroInsts: 0
+NumFixedInsts: 543
+NumPrimary: 0
+Post processing of Bookshelf is done
+[WARNING] ANTENNA_X1 has I/O = 1/0, so skipped
+[WARNING] FA_X1 has I/O = 3/2, so skipped
+[WARNING] TAPCELL_X1 has I/O = 0/0, so skipped
+[WARNING] FILLCELL_X1 has I/O = 0/0, so skipped
+[WARNING] FILLCELL_X16 has I/O = 0/0, so skipped
+[WARNING] FILLCELL_X2 has I/O = 0/0, so skipped
+[WARNING] FILLCELL_X32 has I/O = 0/0, so skipped
+[WARNING] FILLCELL_X4 has I/O = 0/0, so skipped
+[WARNING] FILLCELL_X8 has I/O = 0/0, so skipped
+[WARNING] HA_X1 has I/O = 2/2, so skipped
+[WARNING] LOGIC0_X1 has I/O = 0/1, so skipped
+[WARNING] LOGIC1_X1 has I/O = 0/1, so skipped
+Parsed master use list: Total 123 masters
+NumSequentialCells: 24
+GivenSite: FreePDK45_38x28_10R_NP_162NW_34O
+siteWidth: 380, siteHeight: 2800
+BookshelfDbuRatio: 280.00
+
+Available inst master info from OpenDB
+numInputs: 2 minWidth: 4 maxWidth: 35 masterCnt 26
+numInputs: 3 minWidth: 5 maxWidth: 19 masterCnt 21
+numInputs: 4 minWidth: 6 maxWidth: 24 masterCnt 24
+numInputs: 5 minWidth: 8 maxWidth: 17 masterCnt 6
+numInputs: 6 minWidth: 9 maxWidth: 19 masterCnt 7
+numInputs: 1 minWidth: 2 maxWidth: 66 masterCnt 15
+
+Available ff master info from OpenDB
+numInputs: 2 minWidth: 20 maxWidth: 39 masterCnt 8
+numInputs: 1 minWidth: 17 maxWidth: 35 masterCnt 6
+numInputs: 3 minWidth: 31 maxWidth: 35 masterCnt 4
+numInputs: 5 minWidth: 39 maxWidth: 42 masterCnt 2
+numInputs: 4 minWidth: 33 maxWidth: 36 masterCnt 4
+
+minFFCellWidth: 9
+
+NumSkippedInsts: 27070 (12.84 percent)
+NumAssignedFFs: 28384 (15.44 percent)
+NonFF Cell info from Bookshelf. Key = 10000 * numInputs + width)
+key 10005 numInst: 14018
+key 10006 numInst: 8
+key 10007 numInst: 6454
+key 10008 numInst: 834
+key 20004 numInst: 1
+key 20007 numInst: 9
+key 20008 numInst: 30545
+key 20009 numInst: 46
+key 20011 numInst: 230
+key 20012 numInst: 7925
+key 20013 numInst: 4021
+key 20015 numInst: 66
+key 20016 numInst: 869
+key 20018 numInst: 28
+key 30005 numInst: 1
+key 30009 numInst: 5764
+key 30010 numInst: 3350
+key 30011 numInst: 9044
+key 30012 numInst: 108
+key 30013 numInst: 2711
+key 30015 numInst: 891
+key 30016 numInst: 402
+key 30017 numInst: 1172
+key 30019 numInst: 2204
+key 30021 numInst: 34
+key 40008 numInst: 1
+key 40012 numInst: 3
+key 40014 numInst: 7836
+key 40015 numInst: 5962
+key 40016 numInst: 4710
+key 40017 numInst: 2263
+key 40018 numInst: 159
+key 40020 numInst: 10037
+key 50020 numInst: 164
+key 50024 numInst: 22712
+key 50027 numInst: 723
+key 50051 numInst: 22
+key 60013 numInst: 8790
+key 60014 numInst: 240
+key 60015 numInst: 22
+key 60016 numInst: 1004
+key 60017 numInst: 68
+FF Cell info from Bookshelf. Key = 10000 * numInputs + width)
+key 10009 numInst: 10492
+key 10010 numInst: 950
+key 10011 numInst: 1704
+key 10012 numInst: 823
+key 10013 numInst: 6320
+key 10015 numInst: 179
+key 10016 numInst: 2432
+key 10018 numInst: 130
+key 10022 numInst: 3713
+key 10025 numInst: 43
+key 10031 numInst: 1579
+key 10034 numInst: 18
+key 12304 numInst: 1
+BookshelfCore: 459 459 11151 11128
+DEFCore: 128520 128520 3122280 3115840
+Total 1067 Rows are created in OpenDB
+Vertical(X) Layer: metal4
+c2d 128520 pitch 560
+offset 190
+Macro Place Offset - x: 190, y: 140
+DEFDie: 0 0 3250990 3244780
+
+Total 542 macros are created in OpenDB
+10000 nets are created in OpenDB
+20000 nets are created in OpenDB
+30000 nets are created in OpenDB
+40000 nets are created in OpenDB
+50000 nets are created in OpenDB
+60000 nets are created in OpenDB
+70000 nets are created in OpenDB
+80000 nets are created in OpenDB
+90000 nets are created in OpenDB
+100000 nets are created in OpenDB
+110000 nets are created in OpenDB
+120000 nets are created in OpenDB
+130000 nets are created in OpenDB
+140000 nets are created in OpenDB
+150000 nets are created in OpenDB
+160000 nets are created in OpenDB
+170000 nets are created in OpenDB
+180000 nets are created in OpenDB
+190000 nets are created in OpenDB
+200000 nets are created in OpenDB
+210000 nets are created in OpenDB
+220000 nets are created in OpenDB
+Total 221142 nets are created in OpenDB
+--- Conversion Complete! LEF and DEF generated in /home/anubhav/mleda/test_ispd2005/adaptec1 ---
+Traceback (most recent call last):
+  File "/home/anubhav/mleda/RosettaStone/benchGen/convert_ng45_generic.py", line 51, in <module>
+    sys.exit(0)
+SystemExit: 0
+[INFO ODB-0227] LEF file: /home/anubhav/mleda/OpenROAD/test/Nangate45/Nangate45_tech.lef, created 22 layers, 27 vias
+[WARNING ODB-0217] duplicate VIARULE (Via1Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via1Array-1) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via1Array-2) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via1Array-3) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via1Array-4) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via2Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via2Array-1) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via2Array-2) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via2Array-3) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via2Array-4) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via3Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via3Array-1) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via3Array-2) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via4Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via5Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via6Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via7Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via8Array-0) ignoring...
+[WARNING ODB-0217] duplicate VIARULE (Via9Array-0) ignoring...
+[INFO ODB-0394] Duplicate site FreePDK45_38x28_10R_NP_162NW_34O in Nangate45 already seen in Nangate45_tech
+[INFO ODB-0227] LEF file: /home/anubhav/mleda/OpenROAD/test/Nangate45/Nangate45.lef, created 135 library cells
+[WARNING ODB-0220] WARNING (LEFPARS-2007): NAMESCASESENSITIVE statement is obsolete in version 5.6 and later.
+The LEF parser will ignore this statement.
+To avoid this warning in the future, remove this statement from the LEF file with version 5.6 or later. See file /home/anubhav/mleda/test_ispd2005/adaptec1/adaptec1_macro.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/anubhav/mleda/test_ispd2005/adaptec1/adaptec1_macro.lef, created 542 library cells
+[INFO ODB-0127] Reading DEF file: /home/anubhav/mleda/test_ispd2005/adaptec1/adaptec1_converted.def
+[INFO ODB-0128] Design: /home/anubhav/mleda/test_ispd2005/adaptec1/adaptec1
+[INFO ODB-0094]                 Created 100000 Insts
+[INFO ODB-0097]                 Created 100000 Nets
+[INFO ODB-0097]                 Created 200000 Nets
+[INFO ODB-0130]     Created 1 pins.
+[INFO ODB-0131]     Created 184377 components and 1119280 component-terminals.
+[INFO ODB-0133]     Created 221143 nets and 722772 connections.
+[INFO ODB-0134] Finished DEF file: /home/anubhav/mleda/test_ispd2005/adaptec1/adaptec1_converted.def
+
+========================================
+    OPENROAD: PHYSICAL PLACEMENT FLOW (adaptec1)
+========================================
+[INFO] All Macros Locked.
+
+[INFO] Generating Routing Tracks...
+
+[INFO] Placing Unplaced Top-Level Pins...
+Found 542 macro blocks.
+Using 2 tracks default min distance between IO pins.
+[INFO PPL-0001] Number of available slots 17370
+[INFO PPL-0002] Number of I/O             1
+[INFO PPL-0003] Number of I/O w/sink      1
+[INFO PPL-0004] Number of I/O w/o sink    0
+[INFO PPL-0005] Slots per section         200
+[INFO PPL-0008] Successfully assigned pins to sections.
+[INFO PPL-0012] I/O nets HPWL: 812.78 um.
+
+[INFO] Running Global Placement...
+[INFO GPL-0001] ---- Initialize GPL Main Data Structures
+[INFO GPL-0002] DBU: 2000
+[INFO GPL-0003] SiteSize: (  0.190  1.400 ) um
+[INFO GPL-0004] CoreBBox: ( 64.260 64.260 ) ( 1561.080 1558.060 ) um
+[INFO GPL-0036] Movable instances area:     488494.104 um^2
+[INFO GPL-0037] Total instances area:       1778298.046 um^2
+[INFO GPL-0035] Pin density area adjust:     30998.579 um^2
+[INFO GPL-0032] ---- Initialize Region: Top-level
+[INFO GPL-0006] Number of instances:            184354
+[INFO GPL-0007] Movable instances:              183835
+[INFO GPL-0008] Fixed instances:                   519
+[INFO GPL-0009] Dummy instances:                     0
+[INFO GPL-0010] Number of nets:                 221143
+[INFO GPL-0011] Number of pins:                 722773
+[INFO GPL-0012] Die BBox:  (  0.000  0.000 ) ( 1625.495 1622.390 ) um
+[INFO GPL-0013] Core BBox: ( 64.260 64.260 ) ( 1561.080 1558.060 ) um
+[INFO GPL-0016] Core area:                  2235949.716 um^2
+[INFO GPL-0014] Region name: top-level.
+[INFO GPL-0015] Region area:                2235949.716 um^2
+[INFO GPL-0017] Fixed instances area:       1200856.734 um^2
+[INFO GPL-0018] Movable instances area:     519492.683 um^2
+[INFO GPL-0019] Utilization:                    50.188 %
+[INFO GPL-0020] Standard cells area:        519492.683 um^2
+[INFO GPL-0021] Large instances area:            0.000 um^2
+[INFO GPL-0005] ---- Execute Conjugate Gradient Initial Placement.
+[INFO GPL-0051] Source of initial instance position counters:
+        Odb location = 0        Core center = 183835    Region center = 0
+[InitialPlace]  Iter: 1 conjugate gradient residual: 0.00092000 HPWL: 30232754910
+[InitialPlace]  Iter: 2 conjugate gradient residual: 0.00012132 HPWL: 15814069440
+[InitialPlace]  Iter: 3 conjugate gradient residual: 0.00007944 HPWL: 15309450228
+[InitialPlace]  Iter: 4 conjugate gradient residual: 0.00003071 HPWL: 14976306600
+[InitialPlace]  Iter: 5 conjugate gradient residual: 0.00003002 HPWL: 14786742343
+[InitialPlace]  Iter: 6 conjugate gradient residual: 0.00002679 HPWL: 14637639252
+[InitialPlace]  Iter: 7 conjugate gradient residual: 0.00002471 HPWL: 14529291568
+[InitialPlace]  Iter: 8 conjugate gradient residual: 0.00002544 HPWL: 14464116148
+[InitialPlace]  Iter: 9 conjugate gradient residual: 0.00001736 HPWL: 14405728244
+[InitialPlace]  Iter: 10 conjugate gradient residual: 0.00001828 HPWL: 14358357677
+[InitialPlace]  Iter: 11 conjugate gradient residual: 0.00002354 HPWL: 14312181027
+[InitialPlace]  Iter: 12 conjugate gradient residual: 0.00001691 HPWL: 14274484605
+[InitialPlace]  Iter: 13 conjugate gradient residual: 0.00002021 HPWL: 14244173657
+[InitialPlace]  Iter: 14 conjugate gradient residual: 0.00001383 HPWL: 14219907655
+[InitialPlace]  Iter: 15 conjugate gradient residual: 0.00001325 HPWL: 14192415122
+[InitialPlace]  Iter: 16 conjugate gradient residual: 0.00001100 HPWL: 14187710537
+[InitialPlace]  Iter: 17 conjugate gradient residual: 0.00001148 HPWL: 14191424859
+[InitialPlace]  Iter: 18 conjugate gradient residual: 0.00001110 HPWL: 14200362339
+[InitialPlace]  Iter: 19 conjugate gradient residual: 0.00001296 HPWL: 14205148732
+[InitialPlace]  Iter: 20 conjugate gradient residual: 0.00001311 HPWL: 14210789850
+[INFO GPL-0033] ---- Initialize Nesterov Region: Top-level
+[INFO GPL-0023] Placement target density:       0.7000
+[INFO GPL-0024] Movable insts average area:      2.826 um^2
+[INFO GPL-0025] Ideal bin area:                  4.037 um^2
+[INFO GPL-0026] Ideal bin count:                553871
+[INFO GPL-0027] Total bin area:             2235949.716 um^2
+[INFO GPL-0028] Bin count (X, Y):          64 ,     64
+[INFO GPL-0029] Bin size (W * H):      23.388 * 23.341 um
+[INFO GPL-0030] Number of bins:                   4096
+[INFO GPL-0007] ---- Execute Nesterov Global Placement.
+[INFO GPL-0031] HPWL: Half-Perimeter Wirelength
+Iteration | Overflow |     HPWL (um) |  HPWL(%) |   Penalty | Group
+---------------------------------------------------------------
+        0 |   0.9519 |  3.773464e+06 |   +0.00% |  2.50e-15 |
+       10 |   0.9065 |  5.040724e+06 |  +33.58% |  2.96e-15 |
+       20 |   0.8855 |  5.267722e+06 |   +4.50% |  4.57e-15 |
+       30 |   0.8717 |  5.394013e+06 |   +2.40% |  7.23e-15 |
+       40 |   0.8603 |  5.478507e+06 |   +1.57% |  1.15e-14 |
+       50 |   0.8488 |  5.528531e+06 |   +0.91% |  1.86e-14 |
+       60 |   0.8419 |  5.555324e+06 |   +0.48% |  3.01e-14 |
+       70 |   0.8383 |  5.572559e+06 |   +0.31% |  4.88e-14 |
+       80 |   0.8378 |  5.579486e+06 |   +0.12% |  7.94e-14 |
+       90 |   0.8382 |  5.575596e+06 |   -0.07% |  1.29e-13 |
+      100 |   0.8393 |  5.564679e+06 |   -0.20% |  2.11e-13 |
+      110 |   0.8398 |  5.551294e+06 |   -0.24% |  3.43e-13 |
+      120 |   0.8394 |  5.538121e+06 |   -0.24% |  5.59e-13 |
+      130 |   0.8390 |  5.528375e+06 |   -0.18% |  9.11e-13 |
+      140 |   0.8382 |  5.525405e+06 |   -0.05% |  1.48e-12 |
+      150 |   0.8365 |  5.531086e+06 |   +0.10% |  2.41e-12 |
+      160 |   0.8326 |  5.547874e+06 |   +0.30% |  3.92e-12 |
+      170 |   0.8267 |  5.580130e+06 |   +0.58% |  6.34e-12 |
+      180 |   0.8181 |  5.630338e+06 |   +0.90% |  1.02e-11 |
+      190 |   0.8044 |  5.704049e+06 |   +1.31% |  1.64e-11 |
+      200 |   0.7824 |  5.807982e+06 |   +1.82% |  2.61e-11 |
+      210 |   0.7511 |  5.933925e+06 |   +2.17% |  4.14e-11 |
+      220 |   0.7091 |  6.058578e+06 |   +2.10% |  6.56e-11 |
+      230 |   0.6679 |  6.156214e+06 |   +1.61% |  1.04e-10 |
+      240 |   0.6404 |  6.260033e+06 |   +1.69% |  1.67e-10 |
+      250 |   0.5991 |  6.401032e+06 |   +2.25% |  2.63e-10 |
+      260 |   0.5582 |  6.482275e+06 |   +1.27% |  4.20e-10 |
+      270 |   0.5214 |  6.507787e+06 |   +0.39% |  6.80e-10 |
+      280 |   0.4960 |  6.536657e+06 |   +0.44% |  1.10e-09 |
+      290 |   0.4744 |  6.606776e+06 |   +1.07% |  1.77e-09 |
+      300 |   0.4417 |  6.694228e+06 |   +1.32% |  2.82e-09 |
+      310 |   0.3987 |  6.739589e+06 |   +0.68% |  4.54e-09 |
+      320 |   0.3694 |  6.690700e+06 |   -0.73% |  7.39e-09 |
+      330 |   0.3417 |  6.640681e+06 |   -0.75% |  1.17e-08 |
+      340 |   0.3118 |  6.606857e+06 |   -0.51% |  1.72e-08 |
+      350 |   0.2829 |  6.568751e+06 |   -0.58% |  2.53e-08 |
+      360 |   0.2545 |  6.508786e+06 |   -0.91% |  3.73e-08 |
+      370 |   0.2240 |  6.467748e+06 |   -0.63% |  5.50e-08 |
+      380 |   0.1993 |  6.436454e+06 |   -0.48% |  8.10e-08 |
+      390 |   0.1733 |  6.409149e+06 |   -0.42% |  1.19e-07 |
+      400 |   0.1516 |  6.372822e+06 |   -0.57% |  1.76e-07 |
+      410 |   0.1288 |  6.344482e+06 |   -0.44% |  2.59e-07 |
+      420 |   0.1110 |  6.313940e+06 |   -0.48% |  3.81e-07 |
+      428 |   0.0986 |  6.301594e+06 |          |  5.40e-07 |
+---------------------------------------------------------------
+[INFO GPL-1001] Global placement finished at iteration 428
+[INFO GPL-1002] Placed Cell Area            519492.6826
+[INFO GPL-1003] Available Free Area         1035092.9820
+[INFO GPL-1004] Minimum Feasible Density        0.5100 (cell_area / free_area)
+[INFO GPL-1006]   Suggested Target Densities:
+[INFO GPL-1007]     - For 90% usage of free space: 0.5576
+[INFO GPL-1008]     - For 80% usage of free space: 0.6274
+[INFO GPL-1014] Final placement area: 519492.68 (+0.00%)
+
+[INFO] Running Legalization & Detailed Placement...
+[INFO DPL-0005] Max displacement: +/- 500 sites horizontally, +/- 100 rows vertically.
+Movements Summary
+---------------------------------------
+Total cells:                  183835
+Diamond Move Success:         183835 (100.00%)
+Diamond Move Failure:              0
+Rip-up and replace Success:        0 (  0.00% of diamond failures)
+Rip-up and replace Failure:        0
+Total Placement Failures:          0
+---------------------------------------
+Placement Analysis
+---------------------------------
+total displacement    1302816.7 u
+average displacement        7.1 u
+max displacement           99.8 u
+original HPWL         6302055.4 u
+legalized HPWL        7525363.6 u
+delta HPWL                   19 %
+
+
+========================================
+    FINAL ISPD 2005 EVALUATION REPORT (adaptec1)
+========================================
+>> Placement Legality:
+[WARNING DPL-0011] Padding check failed (106).
+[ERROR DPL-0033] detailed placement checks failed.
+  *WARNING* Placement has minor illegalities (e.g., a few unplaced cells).
+
+>> HPWL (Half-Perimeter Wirelength) & Routing Congestion:
+[WARNING GRT-0300] Timing is not available, setting critical nets percentage to 0.
+[WARNING GRT-0281] Net clk has a large fanout of 28385 terminals.
+[WARNING GRT-0281] Net n7807 has a large fanout of 1455 terminals.
+
+>> Saving Database:
+  Database saved successfully.
+========================================
+========================================
+ Pipeline Complete!
+ Results and final database saved to: /home/anubhav/mleda/test_ispd2005/adaptec1
+ Load /home/anubhav/mleda/test_ispd2005/adaptec1/adaptec1_final.odb into the OpenROAD GUI for heatmaps.
+========================================
+anubhav@LAPTOP-CTTI8UNL:~/mleda/test_ispd2005$ ~/mleda/OpenROAD/build/bin/openroad -gui
+OpenROAD 26Q1-2913-gd1719d5edc
+Features included (+) or not (-): +GPU +GUI +Python
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+
+Scanning for Overlaps...
+[SUCCESS] 0 Overlaps. The macros are perfectly legal.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Components of this program may be licensed under more restrictive licenses which must be honored.
+>>> read_db /home/anubhav/mleda/test_ispd2005/adaptec1/adaptec1_final.odb
+>>> set db [ord::get_db]
+... set block [[$db getChip] getBlock]
+... set overlap_count 0
+... 
+... # Get all macros and pads
+... set target_insts {}
+... foreach inst [$block getInsts] {
+...     if {[$inst isBlock] || [$inst isPad]} {
+...         lappend target_insts $inst
+...     }
+... }
+... 
+... puts "\nScanning for Overlaps..."
+... for {set i 0} {$i < [llength $target_insts]} {incr i} {
+...     set inst1 [lindex $target_insts $i]
+...     set box1 [$inst1 getBBox]
+...     
+...     # Extract coordinates for Box 1
+...     set b1_xmin [$box1 xMin]
+...     set b1_ymin [$box1 yMin]
+...     set b1_xmax [$box1 xMax]
+...     set b1_ymax [$box1 yMax]
+...     
+...     for {set j [expr $i + 1]} {$j < [llength $target_insts]} {incr j} {
+...         set inst2 [lindex $target_insts $j]
+...         set box2 [$inst2 getBBox]
+...         
+...         # Extract coordinates for Box 2
+...         set b2_xmin [$box2 xMin]
+...         set b2_ymin [$box2 yMin]
+...         set b2_xmax [$box2 xMax]
+...         set b2_ymax [$box2 yMax]
+...         
+...         # Standard AABB mathematical intersection
+...         if {$b1_xmin < $b2_xmax && $b1_xmax > $b2_xmin && $b1_ymin < $b2_ymax && $b1_ymax > $b2_ymin} {
+...             puts "\[VIOLATION\] Overlap detected: [$inst1 getName] and [$inst2 getName]"
+...             incr overlap_count
+...         }
+...     }
+... }
+... 
+... if {$overlap_count == 0} {
+...     puts "\[SUCCESS\] 0 Overlaps. The macros are perfectly legal."
+... } else {
+...     puts "\[ERROR\] Found $overlap_count total overlaps."
+... }
+
+Scanning for Overlaps...
+
+[SUCCESS] 0 Overlaps. The macros are perfectly legal.
