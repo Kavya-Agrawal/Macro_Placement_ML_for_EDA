@@ -330,7 +330,7 @@ def main():
     if args.is_test:
         torch.inference_mode()
 
-    for i_epoch in range(1):
+    for i_epoch in range(50):
         score = 0
         raw_score = 0
         start = time.time()
