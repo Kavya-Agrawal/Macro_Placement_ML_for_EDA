@@ -163,6 +163,7 @@
 
 import torch
 import gym
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
@@ -174,34 +175,42 @@ from PPO2 import PPO
 
 
 # -------------------- CONFIG --------------------
-MODEL_PATHS = {
-    "adaptec1": "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec1.pth",
-    "adaptec2": "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec2.pth",
-    "adaptec3": "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec3.pth",
-    "adaptec4": "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec4.pth",
-}
-
+MODEL_PATH = "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec2.pth"
 PPO_PATH = "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model/pretrained_model.pkl"
 
-BENCHMARKS = ["adaptec1", "adaptec2", "adaptec3", "adaptec4"]
-
+BENCHMARK = "adaptec2"
 GRID = 224
 NUM_SAMPLES = 50
 
 
-# -------------------- DEVICE --------------------
+# -------------------- SETUP --------------------
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+placedb = PlaceDB(BENCHMARK)
+placed_num_macro = placedb.node_cnt
 
-# -------------------- LOAD PPO (ONCE) --------------------
+env = gym.make(
+    'place_env-v0',
+    placedb=placedb,
+    placed_num_macro=placed_num_macro,
+    grid=GRID
+).unwrapped
+
+
+# -------------------- LOAD MODELS --------------------
+model = PointerOrderingModel().to(device)
+model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+model.eval()
+
 agent = PPO()
 agent.load_param(PPO_PATH)
+
 agent.actor_net.eval()
 agent.critic_net.eval()
 
 
 # -------------------- RUN PLACEMENT --------------------
-def run_placement(env, placedb, ordering):
+def run_placement(ordering):
 
     env.node_id_to_name = ordering
 
@@ -215,30 +224,44 @@ def run_placement(env, placedb, ordering):
 
     hpwl, cost = comp_res(placedb, env.node_pos, env.ratio)
 
-    return hpwl, cost, env.node_pos.copy(), env.ratio
+    return hpwl, cost, env.node_pos, env.ratio
 
 
-# -------------------- SAVE .PL --------------------
-def save_placement(file_path, node_pos, ratio):
+# -------------------- SAVE .PL FILE --------------------
+def save_placement(file_path, node_pos, ratio, placedb):
 
-    with open(file_path, 'w') as f:
+    with open(file_path, 'w') as fwrite:
+
+        node_place = {}
+
         for node_name in node_pos:
             x, y, _, _ = node_pos[node_name]
 
             x = round(x * ratio + ratio)
             y = round(y * ratio + ratio)
 
-            f.write(f"{node_name}\t{x}\t{y}\t:\tN /FIXED\n")
+            node_place[node_name] = (x, y)
 
-    print(f"✅ Saved: {file_path}")
+        print("len node_place:", len(node_place), "/", placedb.node_cnt)
+
+        for node_name in placedb.node_info:
+            if node_name not in node_place:
+                continue
+
+            x, y = node_place[node_name]
+            fwrite.write(f"{node_name}\t{x}\t{y}\t:\tN /FIXED\n")
+
+    print(f"✅ .pl saved to {file_path}")
 
 
-# -------------------- SAVE FIG --------------------
+# -------------------- SAVE FIGURE --------------------
 def save_fig(file_path, node_pos, grid):
 
     fig = plt.figure()
     ax = fig.add_subplot(111, aspect='equal')
-    ax.axis('off')
+
+    ax.axes.xaxis.set_visible(False)
+    ax.axes.yaxis.set_visible(False)
 
     for node_name in node_pos:
         x, y, size_x, size_y = node_pos[node_name]
@@ -260,36 +283,23 @@ def save_fig(file_path, node_pos, grid):
     fig.savefig(file_path, dpi=150, bbox_inches='tight')
     plt.close()
 
-    print(f"📸 Saved: {file_path}")
+    print(f"📸 Placement image saved to {file_path}")
 
 
-# -------------------- RUN ONE BENCHMARK --------------------
-def run_benchmark(benchmark):
+# -------------------- INFERENCE --------------------
+def inference():
 
-    print("\n====================================")
-    print(f"📦 Running {benchmark}")
-    print("====================================\n")
-
-    # ---- Load correct model ----
-    model = PointerOrderingModel().to(device)
-    model.load_state_dict(torch.load(MODEL_PATHS[benchmark], map_location=device))
-    model.eval()
-
-    # ---- Setup env ----
-    placedb = PlaceDB(benchmark)
-    env = gym.make(
-        'place_env-v0',
-        placedb=placedb,
-        placed_num_macro=placedb.node_cnt,
-        grid=GRID
-    ).unwrapped
+    print(f"\n📦 Benchmark: {BENCHMARK}")
+    print("\n🚀 Running inference...\n")
 
     best_hpwl = float('inf')
+    best_ordering = None
     best_node_pos = None
     best_ratio = None
 
     for i in range(NUM_SAMPLES):
 
+        # ---- generate ordering ----
         ordering, _ = sample_ordering(
             model,
             placedb.node_info,
@@ -297,36 +307,44 @@ def run_benchmark(benchmark):
             device
         )
 
-        hpwl, cost, node_pos, ratio = run_placement(env, placedb, ordering)
+        # ---- evaluate ----
+        hpwl, cost, node_pos, ratio = run_placement(ordering)
 
-        print(f"[{benchmark} | Run {i}] HPWL: {hpwl:.2f}")
+        print(f"[Run {i}] HPWL: {hpwl:.2f} | Cost: {cost:.2f}")
 
         if hpwl < best_hpwl:
             best_hpwl = hpwl
-            best_node_pos = node_pos
+            best_ordering = ordering
+            best_node_pos = node_pos.copy()
             best_ratio = ratio
+
             print("🔥 NEW BEST!")
 
-    # ---- Save outputs ----
-    save_placement(f"{benchmark}_best.pl", best_node_pos, best_ratio)
-    save_fig(f"{benchmark}_placement.png", best_node_pos, GRID)
+    print("\n==============================")
+    print("✅ BEST RESULT")
+    print("==============================")
+    print(f"Best HPWL: {best_hpwl:.2f}")
+    print("Ordering sample:", best_ordering[:10])
 
-    print(f"\n🏆 {benchmark} BEST HPWL: {best_hpwl:.2f}\n")
-
-    return best_hpwl
+    return best_ordering, best_hpwl, best_node_pos, best_ratio
 
 
 # -------------------- MAIN --------------------
 if __name__ == "__main__":
 
-    results = {}
+    best_ordering, best_hpwl, best_node_pos, best_ratio = inference()
 
-    for benchmark in BENCHMARKS:
-        results[benchmark] = run_benchmark(benchmark)
+    # ---- Save .pl ----
+    save_placement(
+        f"{BENCHMARK}_best.pl",
+        best_node_pos,
+        best_ratio,
+        placedb
+    )
 
-    print("\n====================================")
-    print("📊 FINAL RESULTS")
-    print("====================================")
-
-    for b, hpwl in results.items():
-        print(f"{b}: {hpwl:.2f}")
+    # ---- Save image ----
+    save_fig(
+        f"{BENCHMARK}_placement.png",
+        best_node_pos,
+        GRID
+    )
