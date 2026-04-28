@@ -175,13 +175,13 @@ from PPO2 import PPO
 
 # -------------------- CONFIG --------------------
 MODEL_PATHS = {
-    "adaptec1": "/path/to/model_best_adaptec1.pth",
-    "adaptec2": "/path/to/model_best_adaptec2.pth",
-    "adaptec3": "/path/to/model_best_adaptec3.pth",
-    "adaptec4": "/path/to/model_best_adaptec4.pth",
+    "adaptec1": "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec1.pth",
+    "adaptec2": "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec2.pth",
+    "adaptec3": "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec3.pth",
+    "adaptec4": "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec4.pth",
 }
 
-PPO_PATH = "/home/pratyush-kumar-swain/Desktop/Macro_Placement_ML_for_EDA/maskplace/model/pretrained_model.pkl"
+PPO_PATH = "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model/pretrained_model.pkl"
 
 BENCHMARKS = ["adaptec1", "adaptec2", "adaptec3", "adaptec4"]
 
