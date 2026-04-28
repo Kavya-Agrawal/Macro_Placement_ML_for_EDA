@@ -175,10 +175,10 @@ from PPO2 import PPO
 
 
 # -------------------- CONFIG --------------------
-MODEL_PATH = "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec2.pth"
+MODEL_PATH = "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model_best_adaptec4.pth"
 PPO_PATH = "/kaggle/working/Macro_Placement_ML_for_EDA/maskplace/model/pretrained_model.pkl"
 
-BENCHMARK = "adaptec2"
+BENCHMARK = "adaptec4"
 GRID = 224
 NUM_SAMPLES = 50
 
